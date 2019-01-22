@@ -1,0 +1,19 @@
+{
+  "name": "RDS-NodeMailer(SES)",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.392.0",
+    "handlebars": "^4.0.12",
+    "mysql": "^2.16.0",
+    "nodemailer": "^5.1.1",
+    "serverless-offline": "^4.1.4"
+  }
+}
