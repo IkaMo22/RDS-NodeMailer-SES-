@@ -13,8 +13,9 @@
   // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
 };*/
 
-const connection = require('connection');
+const connection = require('./connection');
 const nodemailer = require('nodemailer');
+const ses = require('nodemailer-ses-transport');
 
 module.exports.findAll = (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
@@ -38,51 +39,103 @@ module.exports.findAll = (event, context, callback) => {
 
 
 
-
-module.exports.eviarCorreoPrueba = (event, context, callback) => {
+/**
+ * TEST con cuenta de gmail hay que activar el permiso para aplicaciones menos seguras
+ */
+module.exports.enviarCorreoPrueba = (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false;
+  console.log("inicia envio de correos");
 
-  console.log('inicia envio de correos');
+  var mailOptions = {
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // use SSL
+    auth: {
+      user: "user",
+      pass: "pass"
+    }
+  };
 
-    var transporter = nodemailer.createTransport({
+  var transporter = nodemailer.createTransport(mailOptions);
 
-        host: 'email-smtp.us-east-1.amazonaws.com',
-        port: 465,
-        secure: true,
-        auth: {
-            user: 'usr',
-            pass: 'pass',
-        }
+  console.log("se crea transporte ");
 
+  var mail = {
+    from: "user",  // <-- tiene que ser el mismo que se esta autenticando !
+    to: "user to",
+    subject: "Prueba Lambda",
+    html: '<b>Hello world!</b>',
+  };
 
-    });
-    console.log('se crea transporte ');
+  console.log("se asignan las opciones de correo");
+  console.log("inicia envio de correo");
 
-    var mailOptions = {
+  transporter.sendMail(mail, function(error, info) {
+    if (error) {
+      console.log("ERROR::: ", error);
+      let response = {
+        statusCode: 500,
+        body: JSON.stringify({ error: error })
+      };
+      return callback(null, response);
+    }
 
-        from: 'test@email.mx',
-        to: 'test@email.mx',
-        subject: 'Prueba Lambda',
-
-        html: 'hello World'
+    let response = {
+      statusCode: 200,
+      body: JSON.stringify({ result: info })
     };
-    console.log('se asignan las opciones de correo');
-    console.log('inicia envio de correo');
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            callback(null, {
-              statusCode: 200,
-              body: JSON.stringify({
-                input: 'not send'
-              })
-            })
-        }else {
-            console.log('Email sent');
-            console.log('correo finalizado');
+    console.log("SENT::: ", info);
 
-        }
-    });
-    console.log('funcion finalizada');
+    console.log("correo finalizado");
+    return callback(null, response);
+  });
+  console.log("funcion finalizada");
+};
 
 
+/**
+ * TEST con ses de aws tienes que instalar nodemailer-ses-transport para crear el transporte
+ * npm i nodemailer-ses-transport
+ */
+module.exports.enviarCorreoPruebaSES = (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false;
+  console.log("inicia envio de correos");
+
+  var transporter = nodemailer.createTransport(ses({
+    accessKeyId: 'AWSACCESSKEY',
+    secretAccessKey: 'AWS/Secret/key'
+  }));
+
+  console.log("se crea transporte ");
+
+  var mail = {
+    from: "user from ",
+    to: "user to",
+    subject: "Prueba Lambda",
+    html: '<b>Hello world!</b>',
+  };
+
+  console.log("se asignan las opciones de correo");
+  console.log("inicia envio de correo");
+
+  transporter.sendMail(mail, function(error, info) {
+    if (error) {
+      console.log("ERROR::: ", error);
+      let response = {
+        statusCode: 500,
+        body: JSON.stringify({ error: error })
+      };
+      return callback(null, response);
+    }
+
+    let response = {
+      statusCode: 200,
+      body: JSON.stringify({ result: info })
+    };
+    console.log("SENT::: ", info);
+
+    console.log("correo finalizado");
+    return callback(null, response);
+  });
+  console.log("funcion finalizada");
 };

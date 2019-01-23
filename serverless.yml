@@ -20,14 +20,17 @@ service: test # NOTE: update this with your service name
 provider:
   name: aws
   runtime: nodejs8.10
+  stage: ${opt:stage, 'dev'}
 
+  # si tienes algun problema intenta desactivar tu vpc quizas este este bloqueando
+  # tu salida con el nodemailer
 
-  vpc:
-    securityGroupIds:
-      - sg-123
-    subnetIds:
-      - subnet-123
-      - subnet-123
+  # vpc:
+  #   securityGroupIds:
+  #     - sg-123
+  #   subnetIds:
+  #     - subnet-123
+  #     - subnet-123
 
 # you can overwrite defaults here
 #  stage: dev
@@ -73,11 +76,17 @@ functions:
           path: findAll
           method: get
 
-  eviarCorreoPrueba:
-    handler: handler.eviarCorreoPrueba
+  enviarCorreoPrueba:
+    handler: handler.enviarCorreoPrueba
     events:
       - http:
-          path: eviarCorreoPrueba
+          path: enviarCorreoPrueba
+          method: get
+  enviarCorreoPruebaSES:
+    handler: handler.enviarCorreoPruebaSES
+    events:
+      - http:
+          path: ses/enviarCorreoPrueba
           method: get
 
 #    The following are a few example events you can configure

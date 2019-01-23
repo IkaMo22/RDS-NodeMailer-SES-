@@ -14,6 +14,7 @@
     "handlebars": "^4.0.12",
     "mysql": "^2.16.0",
     "nodemailer": "^5.1.1",
+    "nodemailer-ses-transport": "^1.5.1",
     "serverless-offline": "^4.1.4"
   }
 }
